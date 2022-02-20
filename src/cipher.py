@@ -27,47 +27,43 @@ class Vigenere:
 
 
     def encrypt(self):
-        idx = 0 
-        for i in range(len(self.data)): 
-            if 'A' <= self.data[i] <= 'Z':
-                cipher_number = (letter_to_pos(self.data[i]) + 
-                                letter_to_pos(self.key[idx])) % 26 
+        idx = 0
+        for c in self.data:
+            if 'A' <= c <= 'Z':
+                cipher_number = (letter_to_pos(c) + 
+                                letter_to_pos(self.key[idx % len(self.key)])) % 26 
                 self.encrypted_message += pos_to_letter(cipher_number) 
-
             else:
-                self.encrypted_message += self.data[i]
-            idx = (idx + 1) % len(self.key)
+                self.encrypted_message += c
+            idx += 1
 
 
-    def decrypt_with_key(self):  
-        for i in range(len(self.data)):
-            if 'A' <= self.data[i] <= 'Z': 
-                letter_number = (letter_to_pos(self.data[i]) - 
-                                letter_to_pos(self.key[i % len(self.key)])) % 26
-                self.decrypted_message += pos_to_letter(letter_number)
-            
+    def decrypt_with_key(self):
+        idx = 0
+        for c in self.data:
+            if 'A' <= c <= 'Z':
+                letter_number = (letter_to_pos(c) - 
+                                letter_to_pos(self.key[idx % len(self.key)])) % 26
+                self.decrypted_message += pos_to_letter(letter_number) 
             else:
-                self.decrypted_message += self.data[i]
+                self.decrypted_message += c
+            idx += 1
 
 
-    """
-    POTENTIAL SOURCE OF PROBLEM. INCORRECT POTENTIAL KEYS 
-    """
     # shifts a given letter by the given shift value
     def decrypt_caesar_letter(self, letter, shift):
-        return pos_to_letter((letter_to_pos(letter) - shift) % 26)     
-
+        return pos_to_letter((letter_to_pos(letter) + shift) % 26)     
+    
 
     # this function will return a *letter* that will be one of the letters of the Vigenere cipher KEY 
     def suitable_key_for_caesar(self, observed_letter_frequencies):
-        # letter_in_key = ""
         smallest_statistic = math.inf
         optimal_shift = 0
 
         for shift in range(26):  # testing all 26 possible shifts for a given string e.g "LOME" from LXFOPV MH OEIB
             current_statistic = 0
             for f in range(len(observed_letter_frequencies)):
-                decrypted_caesar_letter = self.decrypt_caesar_letter(pos_to_letter(observed_letter_frequencies[f]), shift)
+                decrypted_caesar_letter = self.decrypt_caesar_letter(pos_to_letter(f), shift)
                 current_statistic += chi_sq(eng_letter_freqs[decrypted_caesar_letter], observed_letter_frequencies[f])
             
             if current_statistic < smallest_statistic:
@@ -75,11 +71,8 @@ class Vigenere:
                 optimal_shift = shift
         
         return pos_to_letter(26 - optimal_shift)
-        # letter_in_key += pos_to_letter(26 - optimal_shift)
-        # return letter_in_key
 
 
-    # FUNCTION WORKS CORRECTLY
     # this function returns a list of frequencies for each letter in the string from *letters_at_indices* list.
     # the function evaluates one string at a time
     def encrypted_string_frequency_analysis(self, str):
@@ -106,7 +99,7 @@ class Vigenere:
                 letters_at_indices[idx % key_len] += c
                 idx += 1
         return letters_at_indices
-
+    
     
     def decrypt_without_key(self):
         self.potential_keys = []  # from all the possible key lengths 1-20 and then you will see which one is most like English
@@ -155,6 +148,7 @@ def main():
     v = Vigenere(file_content, key)
 
     print(v.data)  # just for myself, to see what's in the data variable
+    print()
 
     if task == '-e':
         v.encrypt()    
