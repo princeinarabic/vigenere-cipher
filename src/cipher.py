@@ -37,14 +37,12 @@ class Vigenere:
                 if dir == 1:
                     self.encrypted_message += pos_to_letter(number) 
                 elif dir == -1:
-                    print(pos_to_letter(number))
                     self.decrypted_message += pos_to_letter(number)
 
             else:
                 if dir == 1:
                     self.encrypted_message += c
                 elif dir == -1:
-                    print(pos_to_letter(number))
                     self.decrypted_message += c
             idx += 1
 
