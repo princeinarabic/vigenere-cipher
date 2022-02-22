@@ -141,7 +141,7 @@ def read_file_content(file):
         return f.read()
 
 
-def input_error():
+def argument_error():
     print('usage: cipher.py <filename> <-e | -d> [key]')
     print('-e: encrypt')
     print('-d: decrypt')
@@ -149,7 +149,7 @@ def input_error():
 
 def main():
     if len(sys.argv) < 3:
-        input_error()
+        argument_error()
         quit()
   
     file = sys.argv[1]
@@ -163,7 +163,7 @@ def main():
 
     if task == '-e':
         if key == '':
-            input_error()
+            argument_error()
             print('Specify the [key]')
             quit()
         else:
