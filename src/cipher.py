@@ -26,28 +26,45 @@ class Vigenere:
         self.decrypted_message = ''
 
 
-    def encrypt(self):
+    # an argument 'dir' is either +1 for encryption, or -1 for decryption.
+    def encrypt_or_decrypt(self, dir):
         idx = 0
         for c in self.data:
             if 'A' <= c <= 'Z':
-                cipher_number = (letter_to_pos(c) + 
-                                letter_to_pos(self.key[idx % len(self.key)])) % 26 
-                self.encrypted_message += pos_to_letter(cipher_number) 
-            else:
-                self.encrypted_message += c
-            idx += 1
-
-
-    def decrypt_with_key(self):
-        idx = 0
-        for c in self.data:
-            if 'A' <= c <= 'Z':
-                letter_number = (letter_to_pos(c) - 
+                number = (letter_to_pos(c) + dir * 
                                 letter_to_pos(self.key[idx % len(self.key)])) % 26
-                self.decrypted_message += pos_to_letter(letter_number) 
+
+                if dir == 1:
+                    self.encrypted_message += pos_to_letter(number) 
+                elif dir == -1:
+                    self.decrypted_message += pos_to_letter(number)
+
             else:
-                self.decrypted_message += c
+                if dir == 1:
+                    self.encrypted_message += c
+                elif dir == -1:
+                    self.decrypted_message += c
             idx += 1
+
+
+    def decrypt_with_every_possible_key(self, keys):
+        smallest_stat = math.inf
+        best_text = ''
+
+        for k in keys:
+            self.key = k
+            self.encrypt_or_decrypt(-1)
+
+            observed_freqs = self.string_frequency_analysis(self.decrypted_message)
+            current_stat = 0
+            for f in range(len(observed_freqs)):
+                current_stat += chi_sq(eng_letter_freqs[pos_to_letter(f)], observed_freqs[f])
+            
+            if current_stat < smallest_stat:
+                smallest_stat = current_stat
+                best_text = self.decrypted_message
+            
+        return best_text
 
 
     # shifts a given letter by the given shift value
@@ -73,26 +90,18 @@ class Vigenere:
         return pos_to_letter(26 - optimal_shift)
 
 
-    # this function returns a list of frequencies for each letter in the string from *letters_at_indices* list.
+    # this function returns a list of frequencies for each letter in the string 
     # the function evaluates one string at a time
-    def encrypted_string_frequency_analysis(self, str):
+    def string_frequency_analysis(self, str):
         letter_freq = [0] * 26
         for c in str:
-            letter_freq[letter_to_pos(c)] += 1            
+            if 'A' <= c <= 'Z':
+                letter_freq[letter_to_pos(c)] += 1            
         return letter_freq
-        
 
-    """
-    this function will return a list of strings
-    the strings are the letters that correspond to the same order in a given key length
-    e.g. key_length = 3
-    LXFOPV MH OEIB
-    123123 12 3123 
-    => 1: LOME 2: XPHI 3:FVOB
-    """
-    # FUNCTION WORKS CORRECTLY
+
     def form_letters_at_indices(self, key_len):
-        letters_at_indices = [''] * key_len   # key_len is the key length, you will need to try for numbers 1-20, not just 3 
+        letters_at_indices = [''] * key_len   
         idx = 0
         for c in self.data:
             if 'A' <= c <= 'Z':
@@ -102,19 +111,21 @@ class Vigenere:
     
     
     def decrypt_without_key(self):
-        self.potential_keys = []  # from all the possible key lengths 1-20 and then you will see which one is most like English
+        self.potential_keys = []  
         
         for key_len in range(1, 21):
             potential_key = ''
             letters_at_indices = self.form_letters_at_indices(key_len)      
 
             for cipher in letters_at_indices:  # looking at each string as a separate caesar cipher
-                observed_letter_frequencies = self.encrypted_string_frequency_analysis(cipher)
+                observed_letter_frequencies = self.string_frequency_analysis(cipher)
                 potential_key += self.suitable_key_for_caesar(observed_letter_frequencies)
 
             self.potential_keys.append(potential_key)
 
-        print(self.potential_keys)
+        # print(self.potential_keys)
+        # print()
+        print(self.decrypt_with_every_possible_key(self.potential_keys))
 
 
     def output_encryption(self):
@@ -129,39 +140,43 @@ def read_file_content(file):
     with open(file, 'r') as f: 
         return f.read()
 
+
+def input_error():
+    print('usage: cipher.py <filename> <-e | -d> [key]')
+    print('-e: encrypt')
+    print('-d: decrypt')
+
+
 def main():
     if len(sys.argv) < 3:
-        print('usage: cipher.py <filename> <-e | -d> [key]')
-        print('-e: encrypt')
-        print('-d: decrypt')
+        input_error()
         quit()
   
     file = sys.argv[1]
     task = sys.argv[2]
-
     key = ''
     if len(sys.argv) == 4:
         key = sys.argv[3]
 
     file_content = read_file_content(file)
-    
     v = Vigenere(file_content, key)
 
-    print(v.data)  # just for myself, to see what's in the data variable
-    print()
-
     if task == '-e':
-        v.encrypt()    
-        v.output_encryption()
+        if key == '':
+            input_error()
+            print('Specify the [key]')
+            quit()
+        else:
+            v.encrypt_or_decrypt(1)    
+            v.output_encryption()
 
     if task == '-d':
         if key != '':
-            v.decrypt_with_key()
+            v.encrypt_or_decrypt(-1)
             print(v.output_decryption())
         else:
             v.decrypt_without_key()
 
-
-
+ 
 if __name__ == '__main__':
     main()
