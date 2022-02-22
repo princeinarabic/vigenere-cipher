@@ -32,17 +32,19 @@ class Vigenere:
         for c in self.data:
             if 'A' <= c <= 'Z':
                 number = (letter_to_pos(c) + dir * 
-                                letter_to_pos(self.key[idx % len(self.key)])) % 26
+                          letter_to_pos(self.key[idx % len(self.key)])) % 26
 
                 if dir == 1:
                     self.encrypted_message += pos_to_letter(number) 
                 elif dir == -1:
+                    print(pos_to_letter(number))
                     self.decrypted_message += pos_to_letter(number)
 
             else:
                 if dir == 1:
                     self.encrypted_message += c
                 elif dir == -1:
+                    print(pos_to_letter(number))
                     self.decrypted_message += c
             idx += 1
 
@@ -123,8 +125,6 @@ class Vigenere:
 
             self.potential_keys.append(potential_key)
 
-        # print(self.potential_keys)
-        # print()
         print(self.decrypt_with_every_possible_key(self.potential_keys))
 
 
@@ -173,7 +173,7 @@ def main():
     if task == '-d':
         if key != '':
             v.encrypt_or_decrypt(-1)
-            print(v.output_decryption())
+            v.output_decryption()
         else:
             v.decrypt_without_key()
 
