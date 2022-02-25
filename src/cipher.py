@@ -129,7 +129,7 @@ class Vigenere:
 
 
     def output_encryption(self):
-        print(self.encrypted_message)
+        print(self.encrypted_message.strip())
 
     def output_decryption(self):
         print(self.decrypted_message)
