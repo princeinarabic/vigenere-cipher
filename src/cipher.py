@@ -36,15 +36,15 @@ class Vigenere:
 
                 if dir == 1:
                     self.encrypted_message += pos_to_letter(number) 
-                elif dir == -1:
+                if dir == -1:
                     self.decrypted_message += pos_to_letter(number)
+                idx += 1
 
             else:
                 if dir == 1:
                     self.encrypted_message += c
                 elif dir == -1:
                     self.decrypted_message += c
-            idx += 1
 
 
     def decrypt_with_every_possible_key(self, keys):
@@ -63,6 +63,8 @@ class Vigenere:
             if current_stat < smallest_stat:
                 smallest_stat = current_stat
                 best_text = self.decrypted_message
+            
+            self.decrypted_message = ''
             
         return best_text
 
@@ -122,7 +124,7 @@ class Vigenere:
                 potential_key += self.suitable_key_for_caesar(observed_letter_frequencies)
 
             self.potential_keys.append(potential_key)
-
+        print(self.potential_keys)
         print(self.decrypt_with_every_possible_key(self.potential_keys))
 
 
