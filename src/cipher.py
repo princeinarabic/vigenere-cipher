@@ -72,7 +72,7 @@ class Vigenere:
     # shifts a given letter by the given shift value
     def decrypt_caesar_letter(self, letter, shift):
         return pos_to_letter((letter_to_pos(letter) + shift) % 26)     
-    
+
 
     # this function will return a *letter* that will be one of the letters of the Vigenere cipher KEY 
     def suitable_key_for_caesar(self, observed_letter_frequencies):
@@ -89,7 +89,7 @@ class Vigenere:
                 smallest_statistic = current_statistic
                 optimal_shift = shift
         
-        return pos_to_letter(26 - optimal_shift)
+        return pos_to_letter((26 - optimal_shift) % 26)
 
 
     # this function returns a list of frequencies for each letter in the string 
@@ -110,7 +110,7 @@ class Vigenere:
                 letters_at_indices[idx % key_len] += c
                 idx += 1
         return letters_at_indices
-    
+
     
     def decrypt_without_key(self):
         self.potential_keys = []  
@@ -124,6 +124,7 @@ class Vigenere:
                 potential_key += self.suitable_key_for_caesar(observed_letter_frequencies)
 
             self.potential_keys.append(potential_key)
+            
         print(self.potential_keys)
         print(self.decrypt_with_every_possible_key(self.potential_keys))
 
@@ -132,7 +133,7 @@ class Vigenere:
         print(self.encrypted_message.strip())
 
     def output_decryption(self):
-        print(self.decrypted_message)
+        print(self.decrypted_message.strip())
 
     
 
@@ -154,6 +155,7 @@ def main():
   
     file = sys.argv[1]
     task = sys.argv[2]
+
     key = ''
     if len(sys.argv) == 4:
         key = sys.argv[3]
@@ -177,6 +179,6 @@ def main():
         else:
             v.decrypt_without_key()
 
- 
+
 if __name__ == '__main__':
     main()
