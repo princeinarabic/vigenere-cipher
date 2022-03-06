@@ -125,7 +125,6 @@ class Vigenere:
 
             self.potential_keys.append(potential_key)
             
-        print(self.potential_keys)
         print(self.decrypt_with_every_possible_key(self.potential_keys))
 
 
